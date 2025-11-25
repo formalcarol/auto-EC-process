@@ -15,7 +15,7 @@ service = Service(PATH)
 driver = webdriver.Chrome(service=service)
 wait = WebDriverWait(driver, 10)
 
-def crwal_imily():
+def crawl_imily():
     url = "https://www.imilyoutlet.com.tw/"
     driver.get(url)
 
@@ -100,7 +100,7 @@ def write_imily_excel(products, output_path):
         ])
     wb.save(output_path)
 
-def crwal_findprice():
+def crawl_findprice():
     target_products = ["Apple MacBook Pro M2", "Apple MacBook Air M2", "Apple 原廠 MagSafe 充電器", "OPPO Reno8 Pro 5G", "OPPO Reno8 5G", "OPPO A77 5G", "Lenovo IdeaPad Slim 3 14吋筆電", "HTC VIVE Flow 虛擬實境頭戴裝置", "Kieslect 藍牙通話智慧運動手錶 kr2"]
     product_list = []
     url = "https://www.findprice.com.tw/"
@@ -169,9 +169,8 @@ def write_findprice_excel(products, output_path):
     wb.save(output_path)
 
 if __name__ == '__main__':
-    #brands, products = crwal_imily()
-    #write_imily_excel(products, "imily_products.xlsx")
+    brands, products = crawl_imily()
+    write_imily_excel(products, "imily_products.xlsx")
 
-    findprice_products = crwal_findprice()
+    findprice_products = crawl_findprice()
     write_findprice_excel(findprice_products, "findprice_products.xlsx")
-
