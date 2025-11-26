@@ -6,7 +6,15 @@
     <div>
       <input type="file" @change="onFileChange" />
       <button @click="uploadExcel">上傳 Excel</button>
-      <button @click="getListedProducts">刷新已上架列表</button>
+    </div>
+
+    <!-- 篩選產品種類 -->
+    <div v-if="categories.length" style="margin-top:20px;">
+      <label>篩選產品種類:</label>
+      <select v-model="selectedCategory" @change="filterProducts">
+        <option value="">全部</option>
+        <option v-for="(c, index) in categories" :key="index" :value="c">{{ c }}</option>
+      </select>
     </div>
 
     <!-- 已上架商品 -->
@@ -46,11 +54,13 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 
 const excelFile = ref(null)
 const listedProducts = ref([])
 const uploadResult = ref(null)
+const selectedCategory = ref("")
+const categories = ref([])  // 下拉選單的產品種類
 
 // 選擇檔案
 const onFileChange = (e) => {
@@ -87,6 +97,10 @@ const uploadExcel = async () => {
       merchant_name: item["售賣商城"]
     }))
 
+    // 生成下拉選單選項 (去重)
+    const set = new Set(listedProducts.value.map(p => p.product_category))
+    categories.value = Array.from(set)
+
     alert('上傳成功')
   } catch (err) {
     console.error(err)
@@ -94,33 +108,23 @@ const uploadExcel = async () => {
   }
 }
 
-
-// 模擬上架
-const mockUpload = async () => {
+// 篩選函數 (呼叫後端 /query/)
+const filterProducts = async () => {
   try {
-    const res = await fetch('http://localhost:8000/mock-upload/', {
-      method: 'POST'
-    })
-    if (!res.ok) throw new Error('模擬上架失敗')
+    const res = await fetch(`http://localhost:8000/query/?category=${encodeURIComponent(selectedCategory.value)}`)
+    if (!res.ok) throw new Error('篩選失敗')
     const data = await res.json()
-    listedProducts.value = data.listed_products
-    alert(`已上架 ${data.listed_products.length} 個商品`)
+    
+    listedProducts.value = data.data.map(item => ({
+      product_name: item["產品名稱"],
+      product_category: item["產品種類"],
+      product_price: item["產品價格"],
+      product_url: item["產品網址"],
+      merchant_name: item["售賣商城"]
+    }))
   } catch (err) {
     console.error(err)
-    alert('模擬上架失敗: ' + err.message)
-  }
-}
-
-// 取得已上架商品
-const getListedProducts = async () => {
-  try {
-    const res = await fetch('http://localhost:8000/get-listed-products/')
-    if (!res.ok) throw new Error('取得列表失敗')
-    const data = await res.json()
-    listedProducts.value = data.listed_products
-  } catch (err) {
-    console.error(err)
-    alert('取得列表失敗: ' + err.message)
+    alert('篩選失敗: ' + err.message)
   }
 }
 </script>

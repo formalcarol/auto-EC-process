@@ -35,33 +35,8 @@ async def upload_excel(file: UploadFile = File(...)):
 async def query_by_category(category: str):
     if excel_df is None:
         raise HTTPException(status_code=400, detail="請先上傳 Excel 檔案")
-    col_name = excel_df.columns[0]
-    result = excel_df[excel_df[col_name] == category]
+    if category == "" or category.lower() == "全部":
+        result = excel_df
+    else:
+        result = excel_df[excel_df["產品種類"] == category]
     return {"category": category, "count": len(result), "data": result.to_dict(orient="records")}
-
-@app.post("/mock-upload/")
-async def mock_upload():
-    global listed_products
-    if excel_df is None:
-        raise HTTPException(status_code=400, detail="請先上傳 Excel 檔案")
-    
-    for _, row in excel_df.iterrows():
-        # listed_products.append({
-        #     "product_name": row["產品名稱"],
-        #     "product_category": row["產品種類"],
-        #     "product_price": row["產品價格"],
-        #     "product_url": row["產品網址"],
-        #     "merchant_name": row["售賣商城"]
-        # })
-        listed_products.append({
-            "name": row["產品名稱"],
-            "category": row["產品種類"],
-            "price": row["產品價格"],
-            "profit_margin": 0  # 先給預設
-        })
-
-    return {"message": f"{len(listed_products)} products now listed", "listed_products": listed_products}
-
-@app.get("/get-listed-products/")
-async def get_listed_products():
-    return {"listed_products": listed_products}
