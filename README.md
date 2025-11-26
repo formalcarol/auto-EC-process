@@ -31,4 +31,3 @@ auto-EC-process/
 
 ## 參考資料
 - [105學年度產業實習報告/俞詠涵/真理大學/工業管理與經營資訊學系](https://imei.au.edu.tw/var/file/45/1045/img/2788/68147982.pdf)
->>>>>>> 6fa4d7d (completed backend and frontend)
